@@ -17,10 +17,36 @@ Feature: Bowling Game
         | 9   | 9     |
         | 10  | 10    |
 
+    Scenario Outline: roll 1-1 ball'
+      Then game should
+      """
+      bowling: {
+        <pin>: <score>
+      }
+      """
+      Examples:
+        | pin | score |
+        | 0   | 0     |
+        | 5   | 5     |
+        | 9   | 9     |
+        | 10  | 10    |
+
     Scenario Outline: roll 1-2 ball when first frame not a strike
       Then game should
       """
         makeRoll[5].makeRoll[<secondPin>].score= <score>
+      """
+      Examples:
+        | secondPin | score |
+        | 3         | 5+3   |
+        | 5         | 5+5   |
+
+    Scenario Outline: roll 1-2 ball when first frame not a strike'
+      Then game should
+      """
+      bowling: {
+        5 / <secondPin>: <score>
+      }
       """
       Examples:
         | secondPin | score |
@@ -160,6 +186,14 @@ Feature: Bowling Game
         makeRoll[10].
         makeRoll[10].
         makeRoll[10].makeRoll[10].score= 300
+      """
+
+    Scenario: perfect game
+      Then game should
+      """
+      bowling: {
+        x/x/x/x/x/x/x/x/x/x/x/x: 30*10
+      }
       """
 
     Scenario: roll exception after perfect game
