@@ -12,16 +12,24 @@ public class BowlingGame {
     }
 
     public void roll(int pin) {
+        if (pins.size() == 20 && !isSecondStrikeBonus() && !(isFirstStrikeBonus() && isNotLastBonusForLastStrike()) && !isSpareBonus() ||
+                pins.size() == 21 && !isSecondStrikeBonus() && !(isFirstStrikeBonus() && isNotLastBonusForLastStrike()) ||
+                pins.size() == 22 && !isSecondStrikeBonus() ||
+                pins.size() == 24) {
+            throw new RuntimeException("Game is over");
+        }
         if (isSecondStrikeBonus()) {
             score += pin;
         }
-        if (isFirstStrikeBonus()) {
+        if (isFirstStrikeBonus() && isNotLastBonusForLastStrike()) {
             score += pin;
         }
         if (isSpareBonus()) {
             score += pin;
         }
-        score += pin;
+        if (pins.size() < 20) {
+            score += pin;
+        }
         addPin(pin);
     }
 
@@ -34,6 +42,10 @@ public class BowlingGame {
 
     private boolean isFirstStrikeBonus() {
         return pins.size() >= 2 && pins.size() % 2 == 0 && pins.get(pins.size() - 2) == 10;
+    }
+
+    private boolean isNotLastBonusForLastStrike() {
+        return pins.size() < 22;
     }
 
     private boolean isSecondStrikeBonus() {

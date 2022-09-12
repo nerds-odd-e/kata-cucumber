@@ -96,9 +96,98 @@ Feature: Bowling Game
         | 10 | 10 |
       Then score is 60
 
-  Rule: full game
+  Rule: last frames with spare or strike
 
-    Scenario: 10 strikes
+    Background:
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+
+    Scenario: last second frame is a strike
       When roll
-        | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
-      Then score is 270
+        | 10 | 10 | 3 |
+      Then score is 36
+
+    Scenario: last frame is a strike
+      When roll
+        | 10 | 10 | 3 | 6 |
+      Then score is 42
+
+    Scenario: all X to the end
+      When roll
+        | 10 | 10 | 10 | 10 |
+      Then score is 60
+
+  Rule: acceptance tests
+
+    Scenario: perfect game
+      When roll
+        | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
+      Then score is 300
+
+    Scenario: roll exception after perfect game
+      When roll
+        | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
+      Then game should
+      """
+        roll[1]::throw
+      """
+
+  Rule: game over exception
+
+    Background:
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+      Given roll
+        | 0 | 0 |
+
+    Scenario: roll after normal last framework
+      Given roll
+        | 5 | 4 |
+      Then game should
+      """
+        roll[1]::throw
+      """
+
+    Scenario: roll after spare last framework
+      Given roll
+        | 5 | 5 | 7 |
+      Then game should
+      """
+        roll[1]::throw
+      """
+
+    Scenario: roll after strike last framework
+      Given roll
+        | 10 | 5 | 7 |
+      Then game should
+      """
+        roll[1]::throw
+      """
