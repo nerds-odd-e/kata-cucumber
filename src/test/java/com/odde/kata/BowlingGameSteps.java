@@ -2,6 +2,7 @@ package com.odde.kata;
 
 import com.github.leeonky.dal.DAL;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -10,7 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BowlingGameSteps {
 
-    private BowlingGame bowlingGame = new BowlingGame();
+    private BowlingGame bowlingGame;
+
+    @Before
+    public void init() {
+        bowlingGame = new BowlingGame();
+    }
 
     @Then("score is {int}")
     public void scoreIs(int score) {
@@ -28,7 +34,7 @@ public class BowlingGameSteps {
         expect(bowlingGame).should(expression);
     }
 
-    public static BowlingGame gameRoll(BowlingGame game, int pin) {
+    public static BowlingGame makeRoll(BowlingGame game, int pin) {
         game.roll(pin);
         return game;
     }

@@ -6,9 +6,10 @@ Feature: Bowling Game
   Rule: first frame
 
     Scenario Outline: roll 1-1 ball
-      When roll
-        | <pin> |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[<pin>].score= <score>
+      """
       Examples:
         | pin | score |
         | 0   | 0     |
@@ -17,64 +18,77 @@ Feature: Bowling Game
         | 10  | 10    |
 
     Scenario Outline: roll 1-2 ball when first frame not a strike
-      When roll
-        | 5 | <secondPin> |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[5].makeRoll[<secondPin>].score= <score>
+      """
       Examples:
         | secondPin | score |
-        | 3         | 8     |
-        | 5         | 10    |
+        | 3         | 5+3   |
+        | 5         | 5+5   |
 
   Rule: second frame
 
     Scenario Outline: roll 2-1 ball when first frame is a spare
-      When roll
-        | 5 | 5 | <pin> |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[5].makeRoll[5].
+        makeRoll[<pin>].score= <score>
+      """
       Examples:
-        | pin | score |
-        | 0   | 10    |
-        | 1   | 12    |
-        | 9   | 28    |
+        | pin | score     |
+        | 0   | (5+5)+0   |
+        | 1   | (5+5+1)+1 |
+        | 9   | (5+5+9)+9 |
 
     Scenario: roll 2-1 ball when first frame is a spare (0|10)
-      When roll
-        | 0 | 10 | 8 |
-      Then score is 26
+      Then game should
+      """
+        makeRoll[0].makeRoll[10].
+        makeRoll[8].score= (0+10+8)+8
+      """
 
     Scenario Outline: roll 2-2 ball when first frame is a spare
-      When roll
-        | 5 | 5 | <pin> | 1 |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[5].makeRoll[5].
+        makeRoll[<pin>].makeRoll[1].score= <score>
+      """
       Examples:
-        | pin | score |
-        | 0   | 11    |
-        | 5   | 21    |
+        | pin | score         |
+        | 0   | (5+5+0)+(0+1) |
+        | 5   | (5+5+5)+(5+1) |
 
     Scenario: roll 2-2 ball when first frame is a spare (0|10)
-      When roll
-        | 0 | 10 | 0 | 6 |
-      Then score is 16
+      Then game should
+      """
+        makeRoll[0].makeRoll[10].
+        makeRoll[0].makeRoll[6].score= (0+10+0)+(0+6)
+      """
 
     Scenario Outline: roll 2-1 when first frame is a strike
-      When roll
-        | 10 | <pin> |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[<pin>].score= <score>
+      """
       Examples:
-        | pin | score |
-        | 0   | 10    |
-        | 1   | 12    |
-        | 9   | 28    |
-        | 10  | 30    |
+        | pin | score      |
+        | 0   | (10+0)+0   |
+        | 1   | (10+1)+1   |
+        | 9   | (10+9)+9   |
+        | 10  | (10+10)+10 |
 
     Scenario Outline: roll 2-2 when first frame is a strike
-      When roll
-        | 10 | 5 | <pin> |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[5].makeRoll[<pin>].score= <score>
+      """
       Examples:
-        | pin | score |
-        | 4   | 28    |
-        | 5   | 30    |
+        | pin | score          |
+        | 4   | (10+5+4)+(5+4) |
+        | 5   | (10+5+5)+(5+5) |
 
   Rule: third frame when first frame is a strike
 
@@ -83,111 +97,110 @@ Feature: Bowling Game
         | 10 |
 
     Scenario Outline: roll 3-1
-      When roll
-        | <firstPin> | <secondPin> | <thirdFramePin> |
-      Then score is <score>
+      Then game should
+      """
+        makeRoll[<firstPin>].makeRoll[<secondPin>].
+        makeRoll[<thirdFramePin>].score= <score>
+      """
       Examples:
-        | firstPin | secondPin | thirdFramePin | score |
-        | 0        | 7         | 5             | 29    |
-        | 5        | 5         | 3             | 36    |
+        | firstPin | secondPin | thirdFramePin | score              |
+        | 0        | 7         | 5             | (10+0+7)+(0+7)+5   |
+        | 5        | 5         | 3             | (10+5+5)+(5+5+3)+3 |
 
     Scenario: roll 3-1 when first and second frame are both strikes
-      When roll
-        | 10 | 10 |
-      Then score is 60
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[10].score= 60
+      """
 
   Rule: last frames with spare or strike
 
-    Background:
+    Background: first 8 frames are all 0
       Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
     Scenario: last second frame is a strike
-      When roll
-        | 10 | 10 | 3 |
-      Then score is 36
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[3].score= 36
+      """
 
     Scenario: last frame is a strike
-      When roll
-        | 10 | 10 | 3 | 6 |
-      Then score is 42
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[3].makeRoll[6].score= 42
+      """
 
     Scenario: all X to the end
-      When roll
-        | 10 | 10 | 10 | 10 |
-      Then score is 60
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].makeRoll[10].score= 60
+      """
 
   Rule: acceptance tests
 
     Scenario: perfect game
-      When roll
-        | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
-      Then score is 300
-
-    Scenario: roll exception after perfect game
-      When roll
-        | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
       Then game should
       """
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].makeRoll[10].score= 300
+      """
+
+    Scenario: roll exception after perfect game
+      Then game should
+      """
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].
+        makeRoll[10].makeRoll[10].makeRoll[10].
         roll[1]::throw
       """
 
   Rule: game over exception
 
-    Background:
+    Background: first 9 frames are all 0
       Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
-      Given roll
-        | 0 | 0 |
+        | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
     Scenario: roll after normal last framework
-      Given roll
-        | 5 | 4 |
       Then game should
       """
+        makeRoll[5].makeRoll[4].
         roll[1]::throw
       """
 
     Scenario: roll after spare last framework
-      Given roll
-        | 5 | 5 | 7 |
       Then game should
       """
+        makeRoll[5].makeRoll[5].makeRoll[7].
         roll[1]::throw
       """
 
     Scenario: roll after strike last framework
-      Given roll
-        | 10 | 5 | 7 |
       Then game should
       """
+        makeRoll[10].makeRoll[5].makeRoll[7].
         roll[1]::throw
       """
