@@ -7,6 +7,7 @@ import org.craftedsw.tripservicekata.user.UserSession;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TripService_Original {
 
@@ -23,23 +24,14 @@ public class TripService_Original {
 	}
 
 	public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
-		List<Trip> tripList = new ArrayList<>();
-		User loggedUser = userSession.getLoggedUser();
-		boolean isFriend = false;
-		if (loggedUser != null) {
-			for (User friend : user.getFriends()) {
-				if (friend.equals(loggedUser)) {
-					isFriend = true;
-					break;
-				}
-			}
-			if (isFriend) {
-				tripList = tripRepo.findTripsByUser(user);
-			}
-			return tripList;
-		} else {
-			throw new UserNotLoggedInException();
-		}
+		return getLoggedUser().orElseThrow(UserNotLoggedInException::new)
+				.isFanOfUser(user)
+				.map(friend -> tripRepo.findTripsByUser(user))
+				.orElse(new ArrayList<>());
+	}
+
+	private Optional<User> getLoggedUser() {
+		return Optional.ofNullable(userSession.getLoggedUser());
 	}
 
 }
