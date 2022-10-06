@@ -11,4 +11,5 @@ public class RpnSteps {
     public void rpnShouldBe(String expression) {
         expect(new Rpn()).should(expression);
     }
+
 }
