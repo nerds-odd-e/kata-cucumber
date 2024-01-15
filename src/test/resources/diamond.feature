@@ -5,25 +5,29 @@ Feature: diamond
     """
     diamond: {
       A: A
-      B:
-   ' A
-    B B
-     A'
 
-      C:
-   '  A
-     B B
-    C   C
-     B B
-      A'
-      D:
+      B: ```
+          A
+         B B
+          A
+         ```
 
-   '   A
-      B B
-     C   C
-    D     D
-     C   C
-      B B
-       A'
+      C: ```
+           A
+          B B
+         C   C
+          B B
+           A
+         ```
+
+      D: ```
+            A
+           B B
+          C   C
+         D     D
+          C   C
+           B B
+            A
+         ```
     }
     """

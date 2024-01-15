@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 import static java.util.stream.IntStream.iterate;
 
 public class DiamondGame {
-    public String diamond(char c) {
+    public String diamond(String s) {
+        char c = s.charAt(0);
         return iterate(c - 'A', i -> i >= 'A' - c, i -> i - 1)
                 .mapToObj(i -> bodyLine(c - Math.abs(i), c))
                 .collect(Collectors.joining("\n"));

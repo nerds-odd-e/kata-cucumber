@@ -44,7 +44,7 @@ public class BowlingGameSteps {
     public void gameShould(String expression) {
         RuntimeContextBuilder contextBuilder = DAL.getInstance().getRuntimeContextBuilder();
         contextBuilder.registerStaticMethodExtension(BowlingGameSteps.class)
-                .registerPropertyAccessor(TestGame.class, new JavaClassPropertyAccessor<>(contextBuilder, BeanClass.create(TestGame.class)) {
+                .registerPropertyAccessor(TestGame.class, new JavaClassPropertyAccessor<>(BeanClass.create(TestGame.class)) {
                     @Override
                     public Object getValue(TestGame instance, Object property) {
                         if (property.equals("x")) {
