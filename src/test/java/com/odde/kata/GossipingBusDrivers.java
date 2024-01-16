@@ -6,6 +6,7 @@ import io.cucumber.java.en.Then;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.github.leeonky.dal.Assertions.expect;
 
@@ -15,7 +16,7 @@ public class GossipingBusDrivers {
 
     @Given("the following drivers with their route stops:")
     public void theFollowingDriversWithTheirRouteStops(DataTable table) {
-        simulator = new Simulator(table.asLists().stream().map(stops -> Arrays.asList(stops.get(0).split(" "))).toList());
+        simulator = new Simulator(table.asLists().stream().map(driver -> createStops(driver.get(0))).toList());
     }
 
     @Then("it should:")
@@ -23,22 +24,34 @@ public class GossipingBusDrivers {
         expect(simulator).should(expression);
     }
 
+    private List<String> createStops(String stops) {
+        if (stops.contains("..")) {
+            var result = stops.split(" ");
+            var start = Integer.parseInt(result[0]);
+            var end = Integer.parseInt(result[2]);
+            return IntStream.range(start, end + 1).mapToObj(String::valueOf).toList();
+        } else {
+            return Arrays.asList(stops.split(" "));
+        }
+    }
+
     public static class Simulator {
-        private final List<List<String>> driversAndStops;
+        private final List<Driver> driversAndStops;
 
         public Simulator(List<List<String>> driversAndStops) {
-            this.driversAndStops = driversAndStops;
+            this.driversAndStops = driversAndStops.stream().map(Driver::new).toList();
         }
 
         public int simulate() {
             if (driversAndStops.size() > 1) {
-                for (int stopIndex = 0; stopIndex < driversAndStops.get(0).size(); stopIndex++)
-                    if (driversAndStops.get(0).get(stopIndex).equals(driversAndStops.get(1).get(stopIndex))) {
-                        return stopIndex + 1;
+                for (int step = 0; step < 480; step++)
+                    if (driversAndStops.get(0).getStopByStep(step).equals(driversAndStops.get(1).getStopByStep(step))) {
+                        return step + 1;
                     }
                 throw new IllegalStateException();
             }
             return 1;
         }
+
     }
 }
