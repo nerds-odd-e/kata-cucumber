@@ -52,3 +52,23 @@ Feature: Gossiping Bus Drivers
     """
     simulate::throw.class.simpleName: IllegalStateException
     """
+
+  Scenario: 3 drivers with 1 stop but never met
+    Given the following drivers with their route stops:
+      | 1 |
+      | 2 |
+      | 3 |
+    Then it should:
+    """
+    simulate::throw.class.simpleName: IllegalStateException
+    """
+
+  Scenario: 3 drivers with 1 stop and met
+    Given the following drivers with their route stops:
+      | 1 |
+      | 1 |
+      | 1 |
+    Then it should:
+    """
+    simulate= 1
+    """
