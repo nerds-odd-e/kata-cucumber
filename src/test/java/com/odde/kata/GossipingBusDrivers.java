@@ -43,17 +43,30 @@ public class GossipingBusDrivers {
         }
 
         public int simulate() {
-            for (int step = 0; step < 480; step++) {
-                for (int i = 0; i < driversAndStops.size(); i++) {
-                    for (int j = i + 1; j < driversAndStops.size(); j++) {
-                        driversAndStops.get(i).gossip(step, driversAndStops.get(j));
-                    }
-                }
-                if (driversAndStops.stream().allMatch(driver -> driver.allGossipped(driversAndStops.size()))) {
-                    return step + 1;
-                }
+            return recurSimulate(0);
+        }
+
+        private void recurGossip(int first, int second, int step) {
+            if (first == driversAndStops.size()) {
+                return;
             }
-            throw new IllegalStateException();
+            if (second == driversAndStops.size()) {
+                recurGossip(first + 1, first + 2, step);
+            } else {
+                driversAndStops.get(first).gossip(step, driversAndStops.get(second));
+                recurGossip(first, second + 1, step);
+            }
+        }
+
+        private int recurSimulate(int step) {
+            if (step == 480) {
+                throw new IllegalStateException();
+            }
+            recurGossip(0, 1, step);
+            if (driversAndStops.stream().allMatch(driver -> driver.allGossipped(driversAndStops.size()))) {
+                return step + 1;
+            }
+            return recurSimulate(step + 1);
         }
 
     }
