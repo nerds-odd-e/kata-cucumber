@@ -43,23 +43,14 @@ public class GossipingBusDrivers {
         }
 
         public int simulate() {
-            if (driversAndStops.size() == 1) {
-                return 1;
-            }
             for (int step = 0; step < 480; step++) {
-                if (driversAndStops.size() == 2) {
-                    driversAndStops.get(0).gossip(step, driversAndStops.get(1));
-                    if (driversAndStops.stream().allMatch(driver -> driver.allGossipped(driversAndStops.size()))) {
-                        return step + 1;
+                for (int i = 0; i < driversAndStops.size(); i++) {
+                    for (int j = i + 1; j < driversAndStops.size(); j++) {
+                        driversAndStops.get(i).gossip(step, driversAndStops.get(j));
                     }
                 }
-                if (driversAndStops.size() == 3) {
-                    driversAndStops.get(0).gossip(step, driversAndStops.get(1));
-                    driversAndStops.get(0).gossip(step, driversAndStops.get(2));
-                    driversAndStops.get(1).gossip(step, driversAndStops.get(2));
-                    if (driversAndStops.stream().allMatch(driver -> driver.allGossipped(driversAndStops.size()))) {
-                        return step + 1;
-                    }
+                if (driversAndStops.stream().allMatch(driver -> driver.allGossipped(driversAndStops.size()))) {
+                    return step + 1;
                 }
             }
             throw new IllegalStateException();

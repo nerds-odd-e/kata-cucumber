@@ -72,3 +72,24 @@ Feature: Gossiping Bus Drivers
     """
     simulate= 1
     """
+
+  Scenario: 3 drivers with 2 stop and met
+    Given the following drivers with their route stops:
+      | 1 2 |
+      | 1 3 |
+      | 2 3 |
+    Then it should:
+    """
+    simulate= 3
+    """
+
+  Scenario: 4 drivers with 2 stop and met
+    Given the following drivers with their route stops:
+      | 1 2 |
+      | 1 3 |
+      | 2 3 |
+      | 3 2 |
+    Then it should:
+    """
+    simulate= 4
+    """
